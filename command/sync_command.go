@@ -23,6 +23,7 @@ func (cmd *SyncCommand) FlagSet() *flag.FlagSet {
 	flagSet := flag.NewFlagSet(cmd.Name(), flag.ExitOnError)
 	flagSet.Usage = Usage(cmd)
 	cmd.helmfileArgs.defineFlags(flagSet)
+
 	return flagSet
 }
 
@@ -39,6 +40,7 @@ func (cmd *SyncCommand) Run() error {
 
 	args := cmd.getArgs(config)
 	execCmd := exec.Command("helmfile", args...)
+
 	return cmd.run(execCmd)
 }
 

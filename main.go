@@ -8,36 +8,55 @@ import (
 	"strings"
 )
 
-func printHelpAndExit() {
+const ErrUnknownFlag = 1
+const ErrCommandNotFound = 1
+const ErrCommandFailed = 2
+
+func printHelpAndExit(code int) {
 	_ = command.HelpCommand{}.Run()
-	os.Exit(1)
+
+	os.Exit(code)
+}
+
+func findCommand() command.Command {
+	for _, cmd := range command.Commands {
+		if os.Args[1] == cmd.Name() {
+			return cmd
+		}
+	}
+
+	printHelpAndExit(ErrCommandNotFound)
+
+	return nil
 }
 
 func main() {
 	if len(os.Args) == 1 {
-		printHelpAndExit()
+		printHelpAndExit(ErrCommandNotFound)
 	}
 
-	for _, cmd := range command.Commands {
-		if os.Args[1] == cmd.Name() {
-			flagSet := cmd.FlagSet()
-			if flagSet != nil {
-				if err := flagSet.Parse(os.Args[2:]); err != nil {
-					log.Panic(err)
-				}
-				if flagSet.NArg() > 0 {
-					_, _ = fmt.Fprintf(os.Stderr, "unknown flag %s\n\n", strings.Join(flagSet.Args(), " "))
-					flagSet.Usage()
-					os.Exit(1)
-				}
-			}
-			if err := cmd.Run(); err != nil {
-				_, _ = fmt.Fprintln(os.Stderr, err.Error())
-				os.Exit(2)
-			}
-			return
+	cmd := findCommand()
+
+	flagSet := cmd.FlagSet()
+	if flagSet != nil {
+		if err := flagSet.Parse(os.Args[2:]); err != nil {
+			log.Panic(err)
+		}
+
+		if flagSet.NArg() > 0 {
+			_, _ = fmt.Fprintf(os.Stderr, "unknown flag %s\n\n", strings.Join(flagSet.Args(), " "))
+			flagSet.Usage()
+			os.Exit(ErrUnknownFlag)
 		}
 	}
+
+	if err := cmd.Run(); err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err.Error())
+
+		os.Exit(ErrCommandFailed)
+	}
+
 	_, _ = fmt.Fprintf(os.Stderr, "unknown command %s\n", os.Args[1])
-	printHelpAndExit()
+
+	printHelpAndExit(ErrCommandNotFound)
 }

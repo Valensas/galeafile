@@ -3,6 +3,7 @@ package command
 import (
 	"flag"
 	"fmt"
+
 	"go.szostok.io/version"
 )
 
@@ -25,6 +26,7 @@ func (cmd *VersionCommand) FlagSet() *flag.FlagSet {
 func (cmd *VersionCommand) Run() error {
 	versionInfo := version.Get()
 	isDirty := "no"
+
 	if versionInfo.DirtyBuild {
 		isDirty = "yes"
 	}
@@ -49,5 +51,6 @@ Platform:      %s
 		versionInfo.Compiler,
 		versionInfo.Platform,
 	)
+
 	return nil
 }

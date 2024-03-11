@@ -1,20 +1,25 @@
 package command
 
 import (
+	"errors"
 	"fmt"
 	"galeafile/apis"
-	"golang.org/x/exp/maps"
-	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"os/exec"
 	"strings"
+
+	"golang.org/x/exp/maps"
+	"gopkg.in/yaml.v3"
 )
+
+var ErrEnvNotSet = errors.New("-e/--environment must be set")
+var ErrConfig = errors.New("configuration error")
 
 type defaultCommand struct {
 }
 
-func (defaultCommand) CurrentApiServer() (string, error) {
+func (defaultCommand) CurrentAPIServer() (string, error) {
 	kubeConfigCmd := exec.Command("kubectl", "config", "view", "--minify")
 
 	output, err := kubeConfigCmd.Output()
@@ -24,27 +29,30 @@ func (defaultCommand) CurrentApiServer() (string, error) {
 
 	kubeConfig := apis.KubeConfig{}
 	err = yaml.Unmarshal(output, &kubeConfig)
+
 	if err != nil {
 		return "", fmt.Errorf("cannot unmarshal output from `kubectl config view --minify`: %w", err)
 	}
+
 	return kubeConfig.Clusters[0].Cluster.Server, nil
 }
 
-func (cmd defaultCommand) ValidateConfig(config apis.Config, env string, validateApiServer bool) error {
-	currentApiServer, err := cmd.CurrentApiServer()
+func (cmd defaultCommand) ValidateConfig(config apis.Config, env string, validateAPIServer bool) error {
+	currentAPIServer, err := cmd.CurrentAPIServer()
 	if err != nil {
 		return err
 	}
 
 	if env == "" {
-		return fmt.Errorf("-e/--environment must be set")
+		return ErrEnvNotSet
 	}
 
 	// Find requested environment in Galeafile
 	configEnv, found := config.Environments[env]
 	if !found {
 		return fmt.Errorf(
-			"environment %s does not exist in Galeafile.\nDefined environments: %s",
+			"%w: environment %s does not exist in Galeafile.\nDefined environments: %s",
+			ErrConfig,
 			env,
 			strings.Join(maps.Keys(config.Environments), ", "),
 		)
@@ -54,26 +62,28 @@ func (cmd defaultCommand) ValidateConfig(config apis.Config, env string, validat
 	configCluster, found := config.Clusters[configEnv.Cluster]
 	if !found {
 		return fmt.Errorf(
-			"cluster %s defined for environment %s does not exist in Galeafile",
+			"%w: cluster %s defined for environment %s does not exist in Galeafile",
+			ErrConfig,
 			configEnv.Cluster,
 			env,
 		)
 	}
 
-	if !validateApiServer {
+	if !validateAPIServer {
 		return nil
 	}
 
 	// Check if current api server is valid for the environment
 	for _, server := range configCluster.Servers {
-		if currentApiServer == server {
+		if currentAPIServer == server {
 			return nil
 		}
 	}
 
 	return fmt.Errorf(
-		"current api server %s does not match any of the expected api servers: %s",
-		currentApiServer,
+		"%w: current api server %s does not match any of the expected api servers: %s",
+		ErrConfig,
+		currentAPIServer,
 		strings.Join(configCluster.Servers, ", "),
 	)
 }
@@ -92,6 +102,7 @@ Flags:
 			cmd.Description(),
 			cmd.Name(),
 		)
+
 		cmd.FlagSet().PrintDefaults()
 	}
 }
@@ -108,6 +119,7 @@ func (defaultCommand) runWithPager(cmd *exec.Cmd) error {
 	lessCmd.Stderr = os.Stderr
 
 	log.Printf("Running `%s`", cmd.String())
+
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("failed to start `%s`: %w", cmd.String(), err)
 	}
@@ -116,6 +128,7 @@ func (defaultCommand) runWithPager(cmd *exec.Cmd) error {
 
 	if err := cmd.Wait(); err != nil {
 		_ = lessCmd.Wait()
+
 		return fmt.Errorf("command `%s` errored: %w", cmd.String(), err)
 	}
 
@@ -134,6 +147,7 @@ func (defaultCommand) run(cmd *exec.Cmd) error {
 	cmd.Stderr = os.Stderr
 
 	log.Printf("Running `%s`", cmd.String())
+
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to run `%s`: %w", cmd.String(), err)
 	}

@@ -33,6 +33,7 @@ Available Commands:`)
 	for _, cmd := range Commands {
 		fmt.Printf("  %s%s%s\n", cmd.Name(), strings.Repeat(" ", padding-len(cmd.Name())), cmd.Description())
 	}
+
 	return nil
 }
 
@@ -43,5 +44,6 @@ func longestCommandLength() int {
 			length = len(cmd.Name())
 		}
 	}
+
 	return length
 }

@@ -2,24 +2,25 @@ package apis
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"os"
+
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	Helmfile     *string
-	Environments map[string]Environment
-	Clusters     map[string]Cluster
+	Helmfile     *string                `yaml:"helmfile"`
+	Environments map[string]Environment `yaml:"environments"`
+	Clusters     map[string]Cluster     `yaml:"clusters"`
 }
 
 type Cluster struct {
-	Servers []string
+	Servers []string `yaml:"server"`
 }
 
 type Environment struct {
-	Namespace   *string
-	Cluster     string
-	HelmfileEnv *string
+	Namespace   *string `yaml:"namespace"`
+	Cluster     string  `yaml:"cluster"`
+	HelmfileEnv *string `yaml:"helmfileEnv"`
 }
 
 func LoadConfig() (*Config, error) {
@@ -27,10 +28,13 @@ func LoadConfig() (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to read Galeafile.yaml: %w", err)
 	}
+
 	config := &Config{}
 	err = yaml.Unmarshal(content, config)
+
 	if err != nil {
 		return nil, fmt.Errorf("unable to unmarshall Galeafile.yaml: %w", err)
 	}
+
 	return config, nil
 }

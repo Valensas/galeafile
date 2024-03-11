@@ -23,6 +23,7 @@ func (args *helmfileArgs) appendFlags(config *apis.Config, allArgs []string) []s
 	if config.Helmfile != nil {
 		allArgs = append(allArgs, "-f", *config.Helmfile)
 	}
+
 	if config.Environments[args.env].HelmfileEnv == nil {
 		allArgs = append(allArgs, "-e", args.env)
 	} else if *config.Environments[args.env].HelmfileEnv != "" {
@@ -36,5 +37,6 @@ func (args *helmfileArgs) appendFlags(config *apis.Config, allArgs []string) []s
 	if !args.noSkipDeps {
 		allArgs = append(allArgs, "--skip-deps")
 	}
+
 	return allArgs
 }

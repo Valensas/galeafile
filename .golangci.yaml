@@ -1,0 +1,31 @@
+linters:
+  enable-all: true
+  disable:
+    - depguard
+    - exhaustruct
+    - gci
+    - gochecknoglobals
+    - gofumpt
+    - ireturn
+    - wrapcheck
+    - forbidigo
+
+    # Remove warnings for deprecated linters
+    - deadcode
+    - exhaustivestruct
+    - golint
+    - ifshort
+    - interfacer
+    - maligned
+    - nosnakecase
+    - scopelint
+    - structcheck
+    - varcheck
+
+    # TODO
+    - dupl
+linters-settings:
+  varnamelen:
+    min-name-length: 2
+run:
+  timeout: 5m
