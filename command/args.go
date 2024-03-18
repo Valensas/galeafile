@@ -24,10 +24,12 @@ func (args *helmfileArgs) appendFlags(config *apis.Config, allArgs []string) []s
 		allArgs = append(allArgs, "-f", *config.Helmfile)
 	}
 
-	if config.Environments[args.env].HelmfileEnv == nil {
-		allArgs = append(allArgs, "-e", args.env)
-	} else if *config.Environments[args.env].HelmfileEnv != "" {
-		allArgs = append(allArgs, "-e", *config.Environments[args.env].HelmfileEnv)
+	if args.env != "" {
+		if config.Environments[args.env].HelmfileEnv == nil {
+			allArgs = append(allArgs, "-e", args.env)
+		} else if *config.Environments[args.env].HelmfileEnv != "" {
+			allArgs = append(allArgs, "-e", *config.Environments[args.env].HelmfileEnv)
+		}
 	}
 
 	if args.labelSelector != "" {

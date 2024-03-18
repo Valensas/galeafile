@@ -31,7 +31,7 @@ func (cmd *VersionCommand) Run() error {
 		isDirty = "yes"
 	}
 
-	fmt.Printf(`Helmfile
+	fmt.Printf(`Galeafile
 
 Version:       %s
 Commit:        %s

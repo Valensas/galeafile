@@ -44,7 +44,7 @@ func (cmd defaultCommand) ValidateConfig(config apis.Config, env string, validat
 	}
 
 	if env == "" {
-		return ErrEnvNotSet
+		env = "default"
 	}
 
 	// Find requested environment in Galeafile
@@ -108,34 +108,40 @@ Flags:
 }
 
 func (defaultCommand) runWithPager(cmd *exec.Cmd) error {
-	// r, w := io.Pipe()
-	lessCmd := exec.Command("less")
+	pager := os.Getenv("PAGER")
+	if pager == "" {
+		pager = "less"
+	}
+
+	pagerCmd := exec.Command(pager)
 
 	cmd.Stdin = nil
 	cmd.Stderr = os.Stderr
 
-	lessCmd.Stdin, _ = cmd.StdoutPipe()
-	lessCmd.Stdout = os.Stdout
-	lessCmd.Stderr = os.Stderr
+	pagerCmd.Stdin, _ = cmd.StdoutPipe()
+	pagerCmd.Stdout = os.Stdout
+	pagerCmd.Stderr = os.Stderr
 
-	log.Printf("Running `%s`", cmd.String())
+	log.Printf("Running `%s | %s`", cmd.String(), pager)
 
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("failed to start `%s`: %w", cmd.String(), err)
 	}
 
-	_ = lessCmd.Start()
+	_ = pagerCmd.Start()
 
-	if err := cmd.Wait(); err != nil {
-		_ = lessCmd.Wait()
-
-		return fmt.Errorf("command `%s` errored: %w", cmd.String(), err)
-	}
-
-	err := lessCmd.Wait()
+	err := pagerCmd.Wait()
 
 	if err != nil {
-		return fmt.Errorf("command `less` errored: %w", err)
+		return fmt.Errorf("command `%s` errored: %w", pager, err)
+	}
+
+	if process := cmd.Process; process != nil {
+		_ = process.Kill()
+	} else if err := cmd.Wait(); err != nil {
+		_ = pagerCmd.Wait()
+
+		return fmt.Errorf("command `%s` errored: %w", cmd.String(), err)
 	}
 
 	return nil

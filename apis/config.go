@@ -14,7 +14,7 @@ type Config struct {
 }
 
 type Cluster struct {
-	Servers []string `yaml:"server"`
+	Servers []string `yaml:"servers"`
 }
 
 type Environment struct {

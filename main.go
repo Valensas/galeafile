@@ -55,8 +55,4 @@ func main() {
 
 		os.Exit(ErrCommandFailed)
 	}
-
-	_, _ = fmt.Fprintf(os.Stderr, "unknown command %s\n", os.Args[1])
-
-	printHelpAndExit(ErrCommandNotFound)
 }

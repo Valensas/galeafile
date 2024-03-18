@@ -22,8 +22,6 @@ linters:
     - structcheck
     - varcheck
 
-    # TODO
-    - dupl
 linters-settings:
   varnamelen:
     min-name-length: 2
