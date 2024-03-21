@@ -25,4 +25,4 @@ brews:
     license: "MIT"
     repository:
       owner: Valensas
-      name: homebrew-taps
+      name: homebrew-tap
