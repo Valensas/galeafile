@@ -1,0 +1,16 @@
+builds:
+  - ldflags:
+      - -s -w
+      - -X go.szostok.io/version.version={{.Version}}
+      - -X go.szostok.io/version.buildDate={{.Date}}
+release:
+  github:
+    owner: Valensas
+    name: galeafile
+
+  draft: true
+  replace_existing_draft: true
+  prerelease: auto
+  make_latest: true
+  mode: append
+  name_template: "{{.ProjectName}} v{{.Version}}"
