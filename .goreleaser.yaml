@@ -14,3 +14,15 @@ release:
   make_latest: true
   mode: append
   name_template: "{{.ProjectName}} v{{.Version}}"
+
+brews:
+  - name: galeafile
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    homepage: "https://github.com/valensas/galeafile"
+    description: "Securely manage Helmfile releases."
+    license: "MIT"
+    repository:
+      owner: Valensas
+      name: homebrew-taps
