@@ -8,7 +8,7 @@ release:
     owner: Valensas
     name: galeafile
 
-  draft: true
+  draft: false
   replace_existing_draft: true
   prerelease: auto
   make_latest: true
