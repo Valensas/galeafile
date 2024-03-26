@@ -30,6 +30,10 @@ func (args *helmfileArgs) appendFlags(config *apis.Config, allArgs []string) []s
 		} else if *config.Environments[args.env].HelmfileEnv != "" {
 			allArgs = append(allArgs, "-e", *config.Environments[args.env].HelmfileEnv)
 		}
+
+		if config.Environments[args.env].Namespace != nil {
+			allArgs = append(allArgs, "-n", *config.Environments[args.env].Namespace)
+		}
 	}
 
 	if args.labelSelector != "" {
