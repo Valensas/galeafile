@@ -3,11 +3,12 @@ package command
 import (
 	"errors"
 	"fmt"
-	"galeafile/apis"
 	"log"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/valensas/galeafile/apis"
 
 	"golang.org/x/exp/maps"
 	"gopkg.in/yaml.v3"

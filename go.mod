@@ -1,4 +1,4 @@
-module galeafile
+module github.com/valensas/galeafile
 
 go 1.22
 

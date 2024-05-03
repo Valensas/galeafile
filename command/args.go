@@ -2,7 +2,8 @@ package command
 
 import (
 	"flag"
-	"galeafile/apis"
+
+	"github.com/valensas/galeafile/apis"
 )
 
 type helmfileArgs struct {

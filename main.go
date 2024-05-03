@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"galeafile/command"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/valensas/galeafile/command"
 )
 
 const ErrUnknownFlag = 1
