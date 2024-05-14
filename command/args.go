@@ -10,6 +10,7 @@ type helmfileArgs struct {
 	env           string
 	labelSelector string
 	noSkipDeps    bool
+	file          string
 }
 
 func (args *helmfileArgs) defineFlags(flagSet *flag.FlagSet) {
@@ -18,6 +19,7 @@ func (args *helmfileArgs) defineFlags(flagSet *flag.FlagSet) {
 	flagSet.StringVar(&args.labelSelector, "selector", "", "Only run using the releases that match labels")
 	flagSet.StringVar(&args.labelSelector, "l", "", "Only run using the releases that match labels")
 	flagSet.BoolVar(&args.noSkipDeps, "no-skip-deps", false, "Do not skip updating and running dependencies")
+	flagSet.StringVar(&args.file, "f", "", "Load the configuration from the given file or directory")
 }
 
 func (args *helmfileArgs) appendFlags(config *apis.Config, allArgs []string) []string {
@@ -43,6 +45,10 @@ func (args *helmfileArgs) appendFlags(config *apis.Config, allArgs []string) []s
 
 	if !args.noSkipDeps {
 		allArgs = append(allArgs, "--skip-deps")
+	}
+
+	if args.file != "" {
+		allArgs = append(allArgs, "-f", args.file)
 	}
 
 	return allArgs
