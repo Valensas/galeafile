@@ -31,7 +31,7 @@ var SyncCommand = NewHelmfileCommand(
 	"sync",
 	"Sync Helmfile releases, similar to `helmfile sync`",
 	true,
-	true,
+	false,
 	[]string{"sync", "-i"},
 )
 
