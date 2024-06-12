@@ -8,16 +8,28 @@ import (
 
 type helmfileArgs struct {
 	env           string
-	labelSelector string
+	labelSelector stringSlice
 	noSkipDeps    bool
 	file          string
+}
+
+type stringSlice []string
+
+func (i *stringSlice) String() string {
+	return ""
+}
+
+func (i *stringSlice) Set(value string) error {
+	*i = append(*i, value)
+
+	return nil
 }
 
 func (args *helmfileArgs) defineFlags(flagSet *flag.FlagSet) {
 	flagSet.StringVar(&args.env, "environment", "", "environment to template")
 	flagSet.StringVar(&args.env, "e", "", "environment to template")
-	flagSet.StringVar(&args.labelSelector, "selector", "", "Only run using the releases that match labels")
-	flagSet.StringVar(&args.labelSelector, "l", "", "Only run using the releases that match labels")
+	flagSet.Var(&args.labelSelector, "selector", "Only run using the releases that match labels")
+	flagSet.Var(&args.labelSelector, "l", "Only run using the releases that match labels")
 	flagSet.BoolVar(&args.noSkipDeps, "no-skip-deps", false, "Do not skip updating and running dependencies")
 	flagSet.StringVar(&args.file, "f", "", "Load the configuration from the given file or directory")
 }
@@ -39,8 +51,8 @@ func (args *helmfileArgs) appendFlags(config *apis.Config, allArgs []string) []s
 		}
 	}
 
-	if args.labelSelector != "" {
-		allArgs = append(allArgs, "-l", args.labelSelector)
+	for _, selector := range args.labelSelector {
+		allArgs = append(allArgs, "-l", selector)
 	}
 
 	if !args.noSkipDeps {
